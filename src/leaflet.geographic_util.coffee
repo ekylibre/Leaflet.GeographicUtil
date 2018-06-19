@@ -5,16 +5,19 @@ class L.GeographicUtil
   @Polygon: (points, polyline = false) -> # (Array of [lat,lng] pair)
     geod = GeographicLib.Geodesic.WGS84
     
-    if points.length == 2 || polyline
-      polyline = true
-
-    poly = geod.Polygon(polyline)
+    poly = geod.Polygon(false)
     for point in points
       poly.AddPoint point[0], point[1]
 
     poly = poly.Compute(false, true)
 
-    perimeter: poly.perimeter, area: Math.abs poly.area
+    poly2 = geod.Polygon(true)
+    for point in points
+      poly2.AddPoint point[0], point[1]
+
+    poly2 = poly2.Compute(false, true)
+
+    extrapolatedPerimeter: poly.perimeter, extrapolatedArea: Math.abs(poly.area), perimeter: poly2.perimeter
 
 # Use Karney distance formula
 # ([lat, lng], [lat, lng]) -> Number (in meters)

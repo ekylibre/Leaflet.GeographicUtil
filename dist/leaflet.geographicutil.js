@@ -84,23 +84,27 @@ L.GeographicUtil = (function() {
   function GeographicUtil() {}
 
   GeographicUtil.Polygon = function(points, polyline) {
-    var geod, i, len, point, poly;
+    var geod, i, j, len, len1, point, poly, poly2;
     if (polyline == null) {
       polyline = false;
     }
     geod = GeographicLib.Geodesic.WGS84;
-    if (points.length === 2 || polyline) {
-      polyline = true;
-    }
-    poly = geod.Polygon(polyline);
+    poly = geod.Polygon(false);
     for (i = 0, len = points.length; i < len; i++) {
       point = points[i];
       poly.AddPoint(point[0], point[1]);
     }
     poly = poly.Compute(false, true);
+    poly2 = geod.Polygon(true);
+    for (j = 0, len1 = points.length; j < len1; j++) {
+      point = points[j];
+      poly2.AddPoint(point[0], point[1]);
+    }
+    poly2 = poly2.Compute(false, true);
     return {
-      perimeter: poly.perimeter,
-      area: Math.abs(poly.area)
+      extrapolatedPerimeter: poly.perimeter,
+      extrapolatedArea: Math.abs(poly.area),
+      perimeter: poly2.perimeter
     };
   };
 
